@@ -1,4 +1,4 @@
-common_test: &common_test
+common: &common
   steps:
     - checkout
     - restore_cache:
@@ -14,25 +14,43 @@ common_test: &common_test
 
 version: 2
 jobs:
+  install:
+    docker:
+      - image: circleci/node:lts
+    <<: *common
+
   node-6:
     docker:
       - image: circleci/node:6-stretch
-    <<: *common_test
+    steps:
+      - checkout
+    <<: *common
 
   node-8:
     docker:
       - image: circleci/node:8-stretch
-    <<: *common_test
+    steps:
+      - checkout
+    <<: *common
 
   node-10:
     docker:
       - image: circleci/node:10-stretch
-    <<: *common_test
+    steps:
+      - checkout
+    <<: *common
 
 workflows:
   version: 2
   test:
     jobs:
-      - node-6
-      - node-8
-      - node-10
+      - install
+      - node-6:
+          requires:
+            - install
+      - node-8:
+          requires:
+            - install
+      - node-10:
+          requires:
+            - install
