@@ -5,20 +5,15 @@ common: &common
         key: "{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ checksum \".circleci/config.yml\" }}-{{ checksum \"package-lock.json\" }}"
     - run: node --version
     - run: npm --version
-    - run: npm install
+    - run: npm ci
     - run: npm test
     - save_cache:
         key: "{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ checksum \".circleci/config.yml\" }}-{{ checksum \"package-lock.json\" }}"
         paths:
-          - ./node_modules/
+          - /home/circleci/.npm
 
 version: 2
 jobs:
-  node-6:
-    docker:
-      - image: circleci/node:6-stretch
-    <<: *common
-
   node-8:
     docker:
       - image: circleci/node:8-stretch
@@ -33,6 +28,5 @@ workflows:
   version: 2
   test:
     jobs:
-      - node-6
       - node-8
       - node-10
